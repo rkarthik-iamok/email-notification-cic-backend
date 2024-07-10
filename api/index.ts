@@ -40,6 +40,7 @@ app.get("/", (req, res) => {
 });
 
 // Protected Routes
+// Sample Private Route
 app.get("/private", jwtCheck, (req, res) => {
   res.json({
     service: "Email Notification Backend Service",
@@ -51,6 +52,7 @@ app.get("/private", jwtCheck, (req, res) => {
   });
 });
 
+// Route to Send Verification Email
 app.post("/sendverificationemail", jwtCheck, async (req, res) => {
   console.log(`Request Object: ${JSON.stringify(req.auth, null, 4)}`);
 
@@ -79,6 +81,50 @@ app.post("/sendverificationemail", jwtCheck, async (req, res) => {
   }
 });
 
+// Route to check Job Status
+
+app.get("/checkjobstatus/:id", jwtCheck, async (req, res) => {
+  const jobId = req.params.id;
+  console.log(`Job ID: ${jobId}`);
+
+  // Send the Verification Email
+  try {
+    const response = await emailVerificationService.checkJobStatus(jobId);
+    return res.json(response);
+  } catch (error) {
+    console.log(`Unable to check Job Status, ${error}`);
+    return res.json({
+      status: "failed",
+      reason: `${error}`,
+    });
+  }
+});
+
+app.get("/getEmailVerificationStatus", jwtCheck, async (req, res) => {
+  console.log(`Request Object: ${JSON.stringify(req.auth, null, 4)}`);
+
+  // Send the Verification Email
+  try {
+    const response = await emailVerificationService.getEmailVerificationStatus(
+      req.auth.user_id
+    );
+
+    // Process the output
+    let verification_status = response.email_verified == true ? "true" : false;
+    return res.json({
+      status: verification_status,
+    });
+  } catch (error) {
+    console.log(
+      `Unable to check Email Verification Status for the user, ${error}`
+    );
+    return res.json({
+      status: "failed",
+      reason: `${error}`,
+    });
+  }
+});
+
 app.use(function (err, req, res, next) {
   if (err.name === "UnauthorizedError") {
     res.status(401).json({
@@ -93,4 +139,5 @@ app.use(function (err, req, res, next) {
 app.listen(PORT, "0.0.0.0", async () => {
   console.log(`Email Notification Backend is listening on PORT ${PORT}`);
 });
+
 module.exports = app;
