@@ -52,7 +52,19 @@ app.get("/private", jwtCheck, (req, res) => {
 });
 
 app.post("/sendverificationemail", jwtCheck, async (req, res) => {
-  const payload = req.body;
+  console.log(`Request Object: ${JSON.stringify(req.auth, null, 4)}`);
+
+  // Build the payload from Decoded Access Token
+  const payload = {
+    user_id: `auth0|${req.auth.user_id}`,
+    client_id: `${req.auth.azp}`,
+    identity: {
+      user_id: `${req.auth.user_id}`,
+      provider: "auth0",
+    },
+  };
+
+  // Send the Verification Email
   try {
     const response = await emailVerificationService.sendVerificationEmail(
       payload
@@ -81,5 +93,4 @@ app.use(function (err, req, res, next) {
 app.listen(PORT, "0.0.0.0", async () => {
   console.log(`Email Notification Backend is listening on PORT ${PORT}`);
 });
-
 module.exports = app;
