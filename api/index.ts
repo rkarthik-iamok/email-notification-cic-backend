@@ -1,7 +1,7 @@
 const express = require("express");
 const { expressjwt: jwt } = require("express-jwt");
 const jwks = require("jwks-rsa");
-const config = require("./config");
+const config = require("../config");
 require("dotenv").config();
 const emailVerificationService = require("./services/emailverification");
 
