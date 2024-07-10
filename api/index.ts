@@ -1,13 +1,14 @@
 const express = require("express");
 const { expressjwt: jwt } = require("express-jwt");
 const jwks = require("jwks-rsa");
+const config = require("./config");
 require("dotenv").config();
+const emailVerificationService = require("./services/emailverification");
 
 // Import the Environment Variables
-const PORT = process.env.PORT || "8000";
-const jwksUri = process.env.JWKS_URI;
-const audience = process.env.AUD;
-const issuer = process.env.ISS;
+const PORT = config.auth.port;
+
+// console.log(`${jwksUri}, ${audience}, ${issuer}`);
 
 // Create the Express Listener App
 const app = express();
@@ -18,12 +19,16 @@ const jwtCheck = jwt({
     cache: true,
     ratelimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri,
+    jwksUri: config.auth.jwksUri,
   }),
-  audience,
-  issuer,
+  audience: config.auth.audience,
+  issuer: config.auth.issuer,
   algorithms: ["RS256"],
 });
+
+//
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.get("/", (req, res) => {
@@ -46,6 +51,22 @@ app.get("/private", jwtCheck, (req, res) => {
   });
 });
 
+app.post("/sendverificationemail", jwtCheck, async (req, res) => {
+  const payload = req.body;
+  try {
+    const response = await emailVerificationService.sendVerificationEmail(
+      payload
+    );
+    return res.json(response);
+  } catch (error) {
+    console.log(`Unable to send Verification email, ${error}`);
+    return res.json({
+      status: "failed",
+      reason: `${error}`,
+    });
+  }
+});
+
 app.use(function (err, req, res, next) {
   if (err.name === "UnauthorizedError") {
     res.status(401).json({
@@ -57,7 +78,7 @@ app.use(function (err, req, res, next) {
 });
 
 // Start listening
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(PORT, "0.0.0.0", async () => {
   console.log(`Email Notification Backend is listening on PORT ${PORT}`);
 });
 
