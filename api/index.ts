@@ -3,7 +3,7 @@ const { expressjwt: jwt } = require("express-jwt");
 const jwks = require("jwks-rsa");
 const config = require("../config");
 require("dotenv").config();
-const emailVerificationService = require("./services/emailverification");
+const emailVerificationService = require("../services/emailverification");
 
 // Import the Environment Variables
 const PORT = config.auth.port;
