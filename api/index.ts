@@ -1,10 +1,13 @@
 const express = require("express");
 const { expressjwt: jwt } = require("express-jwt");
 const jwks = require("jwks-rsa");
-require("dotenv").config;
+require("dotenv").config();
 
 // Import the Environment Variables
 const PORT = process.env.PORT || "8000";
+const jwksUri = process.env.JWKS_URI;
+const audience = process.env.AUD;
+const issuer = process.env.ISS;
 
 // Create the Express Listener App
 const app = express();
@@ -15,11 +18,10 @@ const jwtCheck = jwt({
     cache: true,
     ratelimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri:
-      "https://indigo-lobster-5315.cic-demo-platform.auth0app.com/.well-known/jwks.json",
+    jwksUri,
   }),
-  audience: "https://email-notification-backend.vercel.app/",
-  issuer: "https://indigo-lobster-5315.cic-demo-platform.auth0app.com/",
+  audience,
+  issuer,
   algorithms: ["RS256"],
 });
 
