@@ -32,14 +32,22 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Optional: Configure specific CORS options
+const allowedOrigins = [config.auth.cors1, config.auth.cors2];
 
-app.use(
-  cors({
-    origin: "http://localhost:5000", // Replace with your frontend URL in production
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+// Enable CORS with options
+app.use(cors(corsOptions));
 
 // Routes
 app.get("/", (req, res) => {

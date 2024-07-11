@@ -9,6 +9,8 @@ const domain = process.env.ISS;
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
 const tokenUrl = `${domain}oauth/token`;
+const cors1 = process.env.CORS_1;
+const cors2 = process.env.CORS_2;
 
 module.exports = {
   auth: {
@@ -20,5 +22,7 @@ module.exports = {
     client_id,
     client_secret,
     tokenUrl,
+    cors1,
+    cors2,
   },
 };
