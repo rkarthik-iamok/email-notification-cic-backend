@@ -4,6 +4,7 @@ const jwks = require("jwks-rsa");
 const config = require("../config");
 require("dotenv").config();
 const emailVerificationService = require("../services/emailverification");
+const cors = require("cors");
 
 // Import the Environment Variables
 const PORT = config.auth.port;
@@ -30,6 +31,16 @@ const jwtCheck = jwt({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Optional: Configure specific CORS options
+
+app.use(
+  cors({
+    origin: "http://localhost:5000", // Replace with your frontend URL in production
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 // Routes
 app.get("/", (req, res) => {
   res.status(200);
@@ -54,9 +65,6 @@ app.get("/private", jwtCheck, (req, res) => {
 
 // Route to Send Verification Email
 app.post("/sendverificationemail", jwtCheck, async (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   console.log(`Request Object: ${JSON.stringify(req.auth, null, 4)}`);
 
   // Build the payload from Decoded Access Token
@@ -87,9 +95,6 @@ app.post("/sendverificationemail", jwtCheck, async (req, res) => {
 // Route to check Job Status
 
 app.get("/checkjobstatus/:id", jwtCheck, async (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   const jobId = req.params.id;
   console.log(`Job ID: ${jobId}`);
 
@@ -107,9 +112,6 @@ app.get("/checkjobstatus/:id", jwtCheck, async (req, res) => {
 });
 
 app.get("/getEmailVerificationStatus", jwtCheck, async (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   console.log(`Request Object: ${JSON.stringify(req.auth, null, 4)}`);
 
   // Send the Verification Email
