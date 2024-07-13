@@ -134,7 +134,13 @@ app.get("/applicationloginuri", jwtCheck, async (req, res) => {
       const response = await emailVerificationService.getApplicationLoginUri(
         applicationId
       );
-      return res.json(response);
+      const appLoginUri = response.initiate_login_uri
+        ? response.initiate_login_uri
+        : "null";
+
+      return res.json({
+        app_login_uri: `${appLoginUri}`,
+      });
     } catch (error) {
       console.log(`Unable to get Application Login URI details, ${error}`);
       return res.json({
