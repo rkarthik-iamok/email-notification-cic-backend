@@ -69,8 +69,32 @@ async function getEmailVerificationStatus(user_id) {
   return responseData.data;
 }
 
+async function getApplicationLoginUri(appId) {
+  let responseData = {};
+  try {
+    const accessToken = await tokenService.getAccessToken();
+    const url = `${config.auth.domain}api/v2/clients/${appId}`;
+    console.log(`URL: ${url}`);
+
+    // Get the Application Settings
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    responseData.data = response.data;
+  } catch (error) {
+    throw new Error(`Unable to get Application Details: ${error} `);
+  }
+
+  return responseData.data;
+}
+
 module.exports = {
   sendVerificationEmail,
   checkJobStatus,
   getEmailVerificationStatus,
+  getApplicationLoginUri,
 };

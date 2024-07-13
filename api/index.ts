@@ -101,7 +101,6 @@ app.post("/sendverificationemail", jwtCheck, async (req, res) => {
 });
 
 // Route to check Job Status
-
 app.get("/checkjobstatus/:id", jwtCheck, async (req, res) => {
   const jobId = req.params.id;
   console.log(`Job ID: ${jobId}`);
@@ -116,6 +115,33 @@ app.get("/checkjobstatus/:id", jwtCheck, async (req, res) => {
       status: "failed",
       reason: `${error}`,
     });
+  }
+});
+
+app.get("/applicationloginuri", jwtCheck, async (req, res) => {
+  const applicationId = req.auth.azp;
+  if (
+    applicationId == "" ||
+    applicationId == undefined ||
+    applicationId == null
+  ) {
+    return res.json({
+      status: false,
+    });
+  } else {
+    // Get the Login URI details
+    try {
+      const response = await emailVerificationService.getApplicationLoginUri(
+        applicationId
+      );
+      return res.json(response);
+    } catch (error) {
+      console.log(`Unable to get Application Login URI details, ${error}`);
+      return res.json({
+        status: "failed",
+        reason: `${error}`,
+      });
+    }
   }
 });
 
