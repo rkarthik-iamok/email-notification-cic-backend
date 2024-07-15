@@ -11,6 +11,7 @@ const client_secret = process.env.CLIENT_SECRET;
 const tokenUrl = `${domain}oauth/token`;
 const cors1 = process.env.CORS_1;
 const cors2 = process.env.CORS_2;
+const session_secret = process.env.SESSION_SECRET;
 
 module.exports = {
   auth: {
@@ -24,5 +25,6 @@ module.exports = {
     tokenUrl,
     cors1,
     cors2,
+    session_secret,
   },
 };

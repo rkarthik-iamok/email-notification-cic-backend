@@ -1,12 +1,15 @@
 const axios = require("axios");
 const tokenService = require("../auth/tokenService");
 const config = require("../config");
+const jsonwebtoken = require("jsonwebtoken");
 
 async function sendVerificationEmail(payload) {
   let responseData = {};
   try {
     const accessToken = await tokenService.getAccessToken();
     const url = `${config.auth.domain}api/v2/jobs/verification-email`;
+
+    console.log(`Payload: ${JSON.stringify(payload, null, 4)}`);
 
     // Send the verification Email
     const response = await axios.post(url, payload, {
@@ -92,9 +95,30 @@ async function getApplicationLoginUri(appId) {
   return responseData.data;
 }
 
+async function getSessionTokenStatus(token) {
+  // Validate the token
+  let returnData = {};
+  jsonwebtoken.verify(token, config.auth.session_secret, (err, decoded) => {
+    if (err) {
+      console.log(`Token is not valid: ${err}`);
+      returnData.data = {
+        status: "false",
+        error: `${err}`,
+      };
+    } else {
+      console.log(`Token is valid`);
+      returnData.data = {
+        status: true,
+      };
+    }
+  });
+  return returnData;
+}
+
 module.exports = {
   sendVerificationEmail,
   checkJobStatus,
   getEmailVerificationStatus,
   getApplicationLoginUri,
+  getSessionTokenStatus,
 };

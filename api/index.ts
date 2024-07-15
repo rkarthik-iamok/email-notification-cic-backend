@@ -176,6 +176,37 @@ app.get("/getEmailVerificationStatus", jwtCheck, async (req, res) => {
   }
 });
 
+// Validate Session Token
+app.post("/validatesessiontoken", jwtCheck, async (req, res) => {
+  console.log(`Request Object: ${JSON.stringify(req.auth, null, 4)}`);
+
+  console.log(`Request Body: ${JSON.stringify(req.body, null, 4)}`);
+
+  const recvd_session_token = req.body.session_token;
+
+  console.log(`Received Session Token: ${recvd_session_token}`);
+
+  if (
+    !recvd_session_token ||
+    recvd_session_token == undefined ||
+    recvd_session_token == null
+  ) {
+    return res.json({
+      status: false,
+      error: "Error: No Session token in the Request Body",
+    });
+  }
+
+  // Call the Validation Service
+  const response = await emailVerificationService.getSessionTokenStatus(
+    recvd_session_token
+  );
+
+  console.log(`Response from Service: ${JSON.stringify(response, null, 4)}`);
+
+  return res.json(response.data);
+});
+
 app.use(function (err, req, res, next) {
   if (err.name === "UnauthorizedError") {
     res.status(401).json({
